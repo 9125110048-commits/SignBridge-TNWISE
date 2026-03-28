@@ -1,8 +1,8 @@
+opencv-python-headless
 streamlit
 streamlit-webrtc
-opencv-python-headless
+numpy
 googletrans==4.0.0-rc1
 SpeechRecognition
 PyAudio
 av
-numpy
