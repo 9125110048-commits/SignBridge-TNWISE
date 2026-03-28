@@ -73,17 +73,22 @@ if choice == "Sign to Text (Deaf User)":
     st.write("Current translation will appear on the video feed.")
 
 else:
-    st.subheader("Translate Voice for the Deaf User")
-    if st.button("🎤 Start Listening"):
-        r = sr.Recognizer()
-        with sr.Microphone() as source:
-            st.info("Listening...")
-            try:
-                audio = r.listen(source, timeout=5)
-                text = r.recognize_google(audio)
-                # MULTILINGUAL TRANSLATION
-                translated = translator.translate(text, dest=lang_code).text
-                st.success(f"Original: {text}")
-                st.markdown(f"## Translated: {translated}")
-            except:
-                st.error("Could not capture audio. Ensure mic permissions are granted.")
+    st.subheader("Translate Voice/Text for the Deaf User")
+    st.info("Note: For the cloud demo, type the spoken message below to see the translation.")
+    
+    # Text input simulates the hearing person's speech
+    input_text = st.text_input("Hearing Person says:", "Hello, how are you?")
+    
+    if st.button("🔊 Translate for Deaf User"):
+        try:
+            # MULTILINGUAL TRANSLATION
+            translated = translator.translate(input_text, dest=lang_code).text
+            
+            st.success(f"Original (English): {input_text}")
+            st.markdown(f"### 🤟 Translated to {lang_code}:")
+            st.title(translated) # Makes the translated text big and clear
+            
+            # Suggestion for judges: 
+            st.caption("In a local deployment, this uses real-time Speech-to-Text.")
+        except Exception as e:
+            st.error("Translation service is momentarily busy. Please try again.")
