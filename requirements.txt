@@ -3,6 +3,5 @@ streamlit
 streamlit-webrtc
 av
 numpy
-SpeechRecognition
 googletrans==4.0.0-rc1
-PyAudio
+SpeechRecognition
