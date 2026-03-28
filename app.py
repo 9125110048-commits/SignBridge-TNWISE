@@ -1,13 +1,11 @@
 import cv2
 import numpy as np
 import streamlit as st
-from streamlit_webrtc import webrtc_streamer, VideoProcessorBase  # ✅ Fixed import
-from deep_translator import GoogleTranslator  # ✅ More reliable than googletrans
+from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, RTCConfiguration
+from deep_translator import GoogleTranslator
 import av
 
-# --- INITIALIZATION ---
-# No global translator object needed for deep_translator
-# --- Define RTC config right after imports ---
+# --- RTC Configuration ---
 RTC_CONFIGURATION = RTCConfiguration(
     {"iceServers": [
         {"urls": ["stun:stun.l.google.com:19302"]},
@@ -25,7 +23,7 @@ RTC_CONFIGURATION = RTCConfiguration(
     ]}
 )
 
-# --- 1. FINGER COUNTING LOGIC ---
+# --- Finger Counting Logic ---
 def count_fingers_logic(cnt):
     hull_indices = cv2.convexHull(cnt, returnPoints=False)
     if hull_indices is None or len(hull_indices) < 3:
@@ -36,7 +34,9 @@ def count_fingers_logic(cnt):
     count = 0
     for i in range(defects.shape[0]):
         s, e, f, d = defects[i, 0]
-        start, end, far = tuple(cnt[s][0]), tuple(cnt[e][0]), tuple(cnt[f][0])
+        start = tuple(cnt[s][0])
+        end = tuple(cnt[e][0])
+        far = tuple(cnt[f][0])
         a = np.linalg.norm(np.array(end) - np.array(far))
         b = np.linalg.norm(np.array(start) - np.array(far))
         c = np.linalg.norm(np.array(start) - np.array(end))
@@ -45,9 +45,9 @@ def count_fingers_logic(cnt):
             count += 1
     return count + 1
 
-# --- 2. WEBCAM PROCESSOR ---
-class VideoProcessor(VideoProcessorBase):  # ✅ Fixed base class
-    def transform(self, frame: av.VideoFrame) -> av.VideoFrame:  # ✅ Fixed method name
+# --- Webcam Processor ---
+class VideoProcessor(VideoProcessorBase):
+    def transform(self, frame: av.VideoFrame) -> av.VideoFrame:
         img = frame.to_ndarray(format="bgr24")
         img = cv2.flip(img, 1)
 
@@ -64,13 +64,13 @@ class VideoProcessor(VideoProcessorBase):  # ✅ Fixed base class
             if cv2.contourArea(cnt) > 3000:
                 finger_count = count_fingers_logic(cnt)
                 cv2.drawContours(roi, [cnt], -1, (0, 255, 0), 2)
-                cv2.rectangle(img, (100, 100), (400, 400), (0, 200, 255), 2)  # ✅ ROI border
-                label = f"Fingers: {finger_count}"
-                cv2.putText(img, label, (100, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+                cv2.rectangle(img, (100, 100), (400, 400), (0, 200, 255), 2)
+                cv2.putText(img, f"Fingers: {finger_count}", (100, 80),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
         return av.VideoFrame.from_ndarray(img, format="bgr24")
 
-# --- 3. STREAMLIT INTERFACE ---
+# --- Streamlit UI ---
 st.set_page_config(page_title="SignBridge AI", page_icon="🤟")
 st.title("🤟 SignBridge: Two-Way Translation Platform")
 
@@ -84,12 +84,12 @@ lang_code = st.sidebar.selectbox(
 if choice == "Sign to Text (Deaf User)":
     st.subheader("Show your signs to the camera")
     webrtc_streamer(
-    key="sign-to-text",
-    video_processor_factory=VideoProcessor,
-    rtc_configuration=RTC_CONFIGURATION,
-    media_stream_constraints={"video": True, "audio": False},
-    async_processing=True # ✅ Prevents timeout on cloud
-))  # ✅ Fixed indent
+        key="sign-to-text",
+        video_processor_factory=VideoProcessor,
+        rtc_configuration=RTC_CONFIGURATION,
+        media_stream_constraints={"video": True, "audio": False},
+        async_processing=True
+    )
     st.write("Current translation will appear on the video feed.")
 
 else:
@@ -100,8 +100,8 @@ else:
 
     if st.button("🔊 Translate for Deaf User"):
         try:
-            translated = GoogleTranslator(source="auto", dest=lang_code).translate(input_text)  # ✅ Fixed API
-            st.success(f"Original (English): {input_text}")
+            translated = GoogleTranslator(source="auto", dest=lang_code).translate(input_text)
+            st.success(f"Original: {input_text}")
             st.markdown(f"### 🤟 Translated to {lang_code}:")
             st.title(translated)
             st.caption("In a local deployment, this uses real-time Speech-to-Text.")
