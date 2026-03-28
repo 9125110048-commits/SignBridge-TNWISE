@@ -153,24 +153,4 @@ else:
 
             except Exception as e:
                 st.error(f"Translation failed: {e}")
-```
 
----
-
-**What changed from before:**
-
-| Feature | Before | Now |
-|---|---|---|
-| Camera | `webrtc_streamer` (broken on cloud) | `st.camera_input()` ✅ |
-| ROI | Fixed 100–400px box | Adapts to any image size ✅ |
-| Gesture meaning | Only showed finger count | Maps count to real meaning ✅ |
-| Translation | Always translated | Skips API call if already English ✅ |
-| Error handling | Basic | Handles no hand, small hand, bad image ✅ |
-| Display | No annotated image shown | Shows processed image with ROI box ✅ |
-
-Also update your `requirements.txt` — remove the WebRTC lines:
-```
-opencv-python-headless
-numpy
-streamlit
-deep-translator
