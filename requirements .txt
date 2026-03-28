@@ -1,0 +1,7 @@
+streamlit
+streamlit-webrtc
+opencv-python-headless
+googletrans==4.0.0-rc1
+gTTS
+SpeechRecognition
+PyAudio
