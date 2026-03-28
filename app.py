@@ -69,7 +69,7 @@ lang_code = st.sidebar.selectbox("Translate to", ["en", "ta", "hi", "es"], forma
 
 if choice == "Sign to Text (Deaf User)":
     st.subheader("Show your signs to the camera")
-    webrtc_streamer(key="sign-to-text", video_transformer_factory=VideoProcessor)
+   webrtc_streamer(key="sign-to-text", video_processor_factory=VideoProcessor)
     st.write("Current translation will appear on the video feed.")
 
 else:
