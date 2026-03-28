@@ -66,7 +66,13 @@ lang_code = st.sidebar.selectbox(
 
 if choice == "Sign to Text (Deaf User)":
     st.subheader("Show your signs to the camera")
-    webrtc_streamer(key="sign-to-text", video_processor_factory=VideoProcessor)  # ✅ Fixed indent
+    webrtc_streamer(webrtc_streamer(
+    key="sign-to-text",
+    video_processor_factory=VideoProcessor,
+    rtc_configuration=RTC_CONFIGURATION,
+    media_stream_constraints={"video": True, "audio": False},  # ✅ Disable audio if unused
+    async_processing=True  # ✅ Prevents timeout on cloud
+))  # ✅ Fixed indent
     st.write("Current translation will appear on the video feed.")
 
 else:
