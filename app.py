@@ -7,6 +7,23 @@ import av
 
 # --- INITIALIZATION ---
 # No global translator object needed for deep_translator
+# --- Define RTC config right after imports ---
+RTC_CONFIGURATION = RTCConfiguration(
+    {"iceServers": [
+        {"urls": ["stun:stun.l.google.com:19302"]},
+        {"urls": ["stun:stun1.l.google.com:19302"]},
+        {
+            "urls": ["turn:openrelay.metered.ca:80"],
+            "username": "openrelayproject",
+            "credential": "openrelayproject"
+        },
+        {
+            "urls": ["turn:openrelay.metered.ca:443"],
+            "username": "openrelayproject",
+            "credential": "openrelayproject"
+        }
+    ]}
+)
 
 # --- 1. FINGER COUNTING LOGIC ---
 def count_fingers_logic(cnt):
@@ -66,12 +83,12 @@ lang_code = st.sidebar.selectbox(
 
 if choice == "Sign to Text (Deaf User)":
     st.subheader("Show your signs to the camera")
-    webrtc_streamer(webrtc_streamer(
+    webrtc_streamer(
     key="sign-to-text",
     video_processor_factory=VideoProcessor,
     rtc_configuration=RTC_CONFIGURATION,
-    media_stream_constraints={"video": True, "audio": False},  # ✅ Disable audio if unused
-    async_processing=True  # ✅ Prevents timeout on cloud
+    media_stream_constraints={"video": True, "audio": False},
+    async_processing=True # ✅ Prevents timeout on cloud
 ))  # ✅ Fixed indent
     st.write("Current translation will appear on the video feed.")
 
